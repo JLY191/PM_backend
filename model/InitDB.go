@@ -12,7 +12,7 @@ var V = viper.New()
 
 func InitDB() {
 	connectDatabase()
-	logrus.Infoln("Success to connect to database!")
+	createTables()
 }
 
 func connectDatabase() {
@@ -20,13 +20,23 @@ func connectDatabase() {
 	V.AddConfigPath(".")
 	V.SetConfigType("yaml")
 	if err := V.ReadInConfig(); err != nil {
-		logrus.Panic(err)
+		logrus.Fatal("Can't read in DB config file, " + err.Error())
 	}
 	dbArgs := V.GetString("username") + ":" + V.GetString("password") +
 		"@(" + V.GetString("host") + ":" + V.GetString("host_port") + ")/" + V.GetString("db_name") + "?charset=utf8mb4&parseTime=True&loc=Local"
 	var err error
 	DB, err = gorm.Open(mysql.Open(dbArgs), &gorm.Config{})
 	if err != nil {
-		logrus.Fatalln("Failed to connect to database, " + err.Error())
+		logrus.Fatal("Failed to connect to database, " + err.Error())
+	}
+	logrus.Infoln("Success to connect to database!")
+}
+
+func createTables() {
+	err := DB.AutoMigrate(&User{}, &Site{}, &Remark{})
+	if err != nil {
+		logrus.Info("Can't create tables automatically, " + err.Error())
+	} else {
+		logrus.Info("Create tables successfully.")
 	}
 }
