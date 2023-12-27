@@ -28,3 +28,27 @@ type Search struct {
 	Country   string `json:"country" form:"country" query:"country" gorm:"not null;default:中国"`
 	City      string `json:"city" form:"city" query:"city" gorm:"not null"`
 }
+
+type Remark struct {
+	Content string  `json:"content" form:"content" query:"content" gorm:"not null"`
+	Mark    float64 `json:"mark" form:"mark" query:"mark" gorm:"not null;default:10"`
+	UserId  int     `json:"userId" form:"userId" query:"userId" gorm:"not null;foreignKey"`
+	SiteId  int     `json:"siteId" form:"siteId" query:"siteId" gorm:"not null;foreignKey"`
+}
+
+type SUser struct {
+	Id   int    `gorm:"autoIncrement;primaryKey"`
+	Name string `json:"name"   form:"name"    query:"name" gorm:"unique;not null"`
+}
+
+type SSite struct {
+	Id       int    `gorm:"autoIncrement;primaryKey"`
+	SiteName string `json:"siteName" form:"siteName" query:"siteName" gorm:"not null"`
+}
+
+type AddRemark struct {
+	UserName string  `json:"userName" form:"userName" query:"userName" `
+	SiteName string  `json:"siteName" form:"siteName" query:"siteName" `
+	Content  string  `json:"content" form:"content" query:"content" `
+	Mark     float64 `json:"mark" form:"mark" query:"mark" `
+}

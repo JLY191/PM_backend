@@ -15,4 +15,7 @@ func addRoutes() {
 
 	siteGroup := G.Group("/site", middleware.Cors(), middleware.Auth())
 	siteGroup.POST("/search", controller.SearchHandler)
+
+	remarkGroup := G.Group("/remark", middleware.Cors(), middleware.Auth())
+	remarkGroup.POST("/add", controller.AddRemarkHandler)
 }

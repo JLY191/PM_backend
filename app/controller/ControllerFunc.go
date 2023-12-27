@@ -124,3 +124,24 @@ func SearchHandler(c *gin.Context) {
 	}
 	response.MyResponse(c, http.StatusOK, "Sites are: ", ss)
 }
+
+func AddRemarkHandler(c *gin.Context) {
+	a := response.AddRemark{}
+	c.BindJSON(&a)
+	su := response.SUser{}
+	ss := response.SSite{}
+	model.DB.Table("user").Where("name = ?", a.UserName).Find(&su)
+	model.DB.Table("site").Where("site_name = ?", a.SiteName).Find(&ss)
+	if su.Id == 0 || ss.Id == 0 {
+		response.MyResponse(c, http.StatusPreconditionFailed, "Wrong input.", nil)
+		return
+	}
+	r := response.Remark{
+		Content: a.Content,
+		Mark:    a.Mark,
+		UserId:  su.Id,
+		SiteId:  ss.Id,
+	}
+	model.DB.Table("remark").Create(&r)
+	response.MyResponse(c, http.StatusOK, "Remark success.", nil)
+}
