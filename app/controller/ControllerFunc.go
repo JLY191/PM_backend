@@ -79,3 +79,48 @@ func LogoutHandler(c *gin.Context) {
 	c.SetCookie("PM_backend", cookie, -1, "/", "127.0.0.1", false, true)
 	response.MyResponse(c, http.StatusOK, "Logout success", nil)
 }
+
+func SearchHandler(c *gin.Context) {
+	s := response.Search{}
+	var ss []response.Site
+	err := c.BindJSON(&s)
+	if err != nil {
+		response.MyResponse(c, http.StatusInternalServerError, "Bind input fail, "+err.Error(), nil)
+		logrus.Info("Bind input fail, " + err.Error())
+		return
+	}
+	if s.Continent != "" {
+		if s.Country != "" {
+			if s.City != "" {
+				model.DB.Table("site").Where("continent = ? and country = ? and city = ?", s.Continent, s.Country, s.City).Find(&ss)
+			} else if s.City == "" {
+				model.DB.Table("site").Where("continent = ? and country = ?", s.Continent, s.Country).Find(&ss)
+			}
+
+		} else if s.Country == "" {
+			if s.City != "" {
+				model.DB.Table("site").Where("continent = ? and city = ?", s.Continent, s.City).Find(&ss)
+			} else if s.City == "" {
+				model.DB.Table("site").Where("continent = ?", s.Continent).Find(&ss)
+			}
+		}
+
+	} else if s.Continent == "" {
+		if s.Country != "" {
+			if s.City != "" {
+				model.DB.Table("site").Where("and country = ? and city = ?", s.Country, s.City).Find(&ss)
+			} else if s.City == "" {
+				model.DB.Table("site").Where("country = ?", s.Country).Find(&ss)
+			}
+
+		} else if s.Country == "" {
+			if s.City != "" {
+				model.DB.Table("site").Where("city = ?", s.City).Find(&ss)
+			} else if s.City == "" {
+				response.MyResponse(c, http.StatusPreconditionFailed, "No enough search queries!", nil)
+				return
+			}
+		}
+	}
+	response.MyResponse(c, http.StatusOK, "Sites are: ", ss)
+}
