@@ -322,7 +322,7 @@ func ModifyRemarkHandler(c *gin.Context) {
 		UserId: su.Id,
 		SiteId: ss.Id,
 	}
-	model.DB.Table("remark").Where("user_id = ? and site_id = ?", r.UserId, r.SiteId).Updates(&tmp)
+	model.DB.Table("remark").Where("user_id = ? and site_id = ?", tmp.UserId, tmp.SiteId).Find(&tmp)
 	if tmp.Content == "" {
 		response.MyResponse(c, http.StatusPreconditionFailed, "Please create a remark first.", nil)
 		return
