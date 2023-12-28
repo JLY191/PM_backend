@@ -27,6 +27,7 @@ type Search struct {
 	Continent string `json:"continent" form:"continent" query:"continent" gorm:"not null;default:亚洲"`
 	Country   string `json:"country" form:"country" query:"country" gorm:"not null;default:中国"`
 	City      string `json:"city" form:"city" query:"city" gorm:"not null"`
+	SiteName  string `json:"siteName" form:"siteName" query:"siteName" gorm:"not null"`
 }
 
 type Remark struct {

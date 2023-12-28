@@ -89,39 +89,76 @@ func SearchHandler(c *gin.Context) {
 		logrus.Info("Bind input fail, " + err.Error())
 		return
 	}
-	if s.Continent != "" {
-		if s.Country != "" {
-			if s.City != "" {
-				model.DB.Table("site").Where("continent = ? and country = ? and city = ?", s.Continent, s.Country, s.City).Find(&ss)
-			} else if s.City == "" {
-				model.DB.Table("site").Where("continent = ? and country = ?", s.Continent, s.Country).Find(&ss)
+	if s.SiteName != "" {
+		if s.Continent != "" {
+			if s.Country != "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("continent = ? and country = ? and city = ? and site_name = ?", s.Continent, s.Country, s.City, s.SiteName).Find(&ss)
+				} else if s.City == "" {
+					model.DB.Table("site").Where("continent = ? and country = ? and site_name = ?", s.Continent, s.Country, s.SiteName).Find(&ss)
+				}
+
+			} else if s.Country == "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("continent = ? and city = ? and site_name = ?", s.Continent, s.City, s.SiteName).Find(&ss)
+				} else if s.City == "" {
+					model.DB.Table("site").Where("continent = ? and site_name = ?", s.Continent, s.SiteName).Find(&ss)
+				}
 			}
 
-		} else if s.Country == "" {
-			if s.City != "" {
-				model.DB.Table("site").Where("continent = ? and city = ?", s.Continent, s.City).Find(&ss)
-			} else if s.City == "" {
-				model.DB.Table("site").Where("continent = ?", s.Continent).Find(&ss)
+		} else if s.Continent == "" {
+			if s.Country != "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("and country = ? and city = ? and site_name = ?", s.Country, s.City, s.SiteName).Find(&ss)
+				} else if s.City == "" {
+					model.DB.Table("site").Where("country = ? and site_name = ?", s.Country, s.SiteName).Find(&ss)
+				}
+
+			} else if s.Country == "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("city = ? and site_name = ?", s.City, s.SiteName).Find(&ss)
+				} else if s.City == "" {
+					model.DB.Table("site").Where("site_name = ?", s.SiteName).Find(&ss)
+				}
 			}
 		}
 
-	} else if s.Continent == "" {
-		if s.Country != "" {
-			if s.City != "" {
-				model.DB.Table("site").Where("and country = ? and city = ?", s.Country, s.City).Find(&ss)
-			} else if s.City == "" {
-				model.DB.Table("site").Where("country = ?", s.Country).Find(&ss)
+	} else if s.SiteName == "" {
+		if s.Continent != "" {
+			if s.Country != "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("continent = ? and country = ? and city = ?", s.Continent, s.Country, s.City).Find(&ss)
+				} else if s.City == "" {
+					model.DB.Table("site").Where("continent = ? and country = ?", s.Continent, s.Country).Find(&ss)
+				}
+
+			} else if s.Country == "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("continent = ? and city = ?", s.Continent, s.City).Find(&ss)
+				} else if s.City == "" {
+					model.DB.Table("site").Where("continent = ?", s.Continent).Find(&ss)
+				}
 			}
 
-		} else if s.Country == "" {
-			if s.City != "" {
-				model.DB.Table("site").Where("city = ?", s.City).Find(&ss)
-			} else if s.City == "" {
-				response.MyResponse(c, http.StatusPreconditionFailed, "No enough search queries!", nil)
-				return
+		} else if s.Continent == "" {
+			if s.Country != "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("and country = ? and city = ?", s.Country, s.City).Find(&ss)
+				} else if s.City == "" {
+					model.DB.Table("site").Where("country = ?", s.Country).Find(&ss)
+				}
+
+			} else if s.Country == "" {
+				if s.City != "" {
+					model.DB.Table("site").Where("city = ?", s.City).Find(&ss)
+				} else if s.City == "" {
+					response.MyResponse(c, http.StatusPreconditionFailed, "No enough search queries!", nil)
+					return
+				}
 			}
 		}
 	}
+
 	response.MyResponse(c, http.StatusOK, "Sites are: ", ss)
 }
 
@@ -144,4 +181,20 @@ func AddRemarkHandler(c *gin.Context) {
 	}
 	model.DB.Table("remark").Create(&r)
 	response.MyResponse(c, http.StatusOK, "Remark success.", nil)
+}
+
+func DeleteRemark(c *gin.Context) {
+
+}
+
+func GetMark(c *gin.Context) {
+
+}
+
+func GetUserRemark(c *gin.Context) {
+
+}
+
+func ModifyUserRemark(c *gin.Context) {
+
 }
