@@ -25,7 +25,7 @@ func RegisterHandler(c *gin.Context) {
 		Email:    u.Email,
 		Password: utils.GetHashPwd(u.Password),
 	}
-	model.DB.Create(&mu)
+	model.DB.Table("user").Create(&mu)
 	response.MyResponse(c, http.StatusOK, "Register success.", nil)
 }
 
@@ -318,11 +318,44 @@ func ModifyRemarkHandler(c *gin.Context) {
 		UserId:  su.Id,
 		SiteId:  ss.Id,
 	}
+	tmp := model.Remark{
+		UserId: su.Id,
+		SiteId: ss.Id,
+	}
+	model.DB.Table("remark").Where("user_id = ? and site_id = ?", r.UserId, r.SiteId).Updates(&tmp)
+	if tmp.Content == "" {
+		response.MyResponse(c, http.StatusPreconditionFailed, "Please create a remark first.", nil)
+		return
+	}
 	model.DB.Table("remark").Where("user_id = ? and site_id = ?", r.UserId, r.SiteId).Updates(&r)
 	response.MyResponse(c, http.StatusOK, "Modify success.", nil)
 	return
 }
 
 func GetUserHistoryRemark(c *gin.Context) {
-
+	currentUser, ok := c.Get("username")
+	if !ok {
+		response.MyResponse(c, http.StatusInternalServerError, "Server context error.", nil)
+		return
+	}
+	su := response.SUser{
+		Name: currentUser.(string),
+	}
+	model.DB.Table("user").Where("name = ?", su.Name).Find(&su)
+	var rmks []response.Remark
+	var hisrmks []response.HistoryRemark
+	model.DB.Table("remark").Where("user_id = ?", su.Id).Find(&rmks)
+	for i := 0; i < len(rmks); i++ {
+		ss := response.SSite{
+			Id: rmks[i].SiteId,
+		}
+		model.DB.Table("site").Where("id = ?", ss.Id).Find(&ss)
+		hisrmks = append(hisrmks, response.HistoryRemark{
+			SiteName: ss.SiteName,
+			Content:  rmks[i].Content,
+			Mark:     rmks[i].Mark,
+		})
+	}
+	response.MyResponse(c, http.StatusOK, "Your remarks are: ", hisrmks)
+	return
 }

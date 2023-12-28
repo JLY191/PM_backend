@@ -43,6 +43,12 @@ type PartialRemark struct {
 	Mark     float64 `json:"mark" form:"mark" query:"mark" gorm:"not null;default:10"`
 }
 
+type HistoryRemark struct {
+	SiteName string  `json:"siteName" form:"siteName" query:"siteName" gorm:"not null"`
+	Content  string  `json:"content" form:"content" query:"content" gorm:"not null"`
+	Mark     float64 `json:"mark" form:"mark" query:"mark" gorm:"not null;default:10"`
+}
+
 type SUser struct {
 	Id   int    `gorm:"autoIncrement;primaryKey"`
 	Name string `json:"name"   form:"name"    query:"name" gorm:"unique;not null"`

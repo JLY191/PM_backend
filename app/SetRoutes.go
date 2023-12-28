@@ -21,4 +21,5 @@ func addRoutes() {
 	remarkGroup.POST("/add", controller.AddRemarkHandler)
 	remarkGroup.POST("/delete", controller.DeleteRemarkHandler)
 	remarkGroup.POST("/modify", controller.ModifyRemarkHandler)
+	remarkGroup.GET("/user", controller.GetUserHistoryRemark)
 }
