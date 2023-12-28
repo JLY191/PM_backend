@@ -37,6 +37,12 @@ type Remark struct {
 	SiteId  int     `json:"siteId" form:"siteId" query:"siteId" gorm:"not null;foreignKey"`
 }
 
+type PartialRemark struct {
+	UserName string  `json:"userName" form:"userName" query:"userName" gorm:"not null"`
+	Content  string  `json:"content" form:"content" query:"content" gorm:"not null"`
+	Mark     float64 `json:"mark" form:"mark" query:"mark" gorm:"not null;default:10"`
+}
+
 type SUser struct {
 	Id   int    `gorm:"autoIncrement;primaryKey"`
 	Name string `json:"name"   form:"name"    query:"name" gorm:"unique;not null"`
@@ -52,4 +58,15 @@ type AddRemark struct {
 	SiteName string  `json:"siteName" form:"siteName" query:"siteName" `
 	Content  string  `json:"content" form:"content" query:"content" `
 	Mark     float64 `json:"mark" form:"mark" query:"mark" `
+}
+
+type SiteRemark struct {
+	SiteName string          `json:"siteName" form:"siteName" query:"siteName" `
+	Average  float64         `json:"average" form:"average" query:"average" `
+	TotalCnt int             `json:"totalCnt" form:"totalCnt" query:"totalCnt" `
+	Remarks  []PartialRemark `json:"remarks" form:"remarks" query:"remarks" `
+}
+
+type SiteQuery struct {
+	SiteName string `json:"siteName" form:"siteName" query:"siteName" `
 }

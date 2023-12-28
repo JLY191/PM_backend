@@ -13,8 +13,9 @@ func addRoutes() {
 	userGroup.POST("/login", controller.LoginHandler)
 	userGroup.GET("/logout", controller.LogoutHandler)
 
-	siteGroup := G.Group("/site", middleware.Cors(), middleware.Auth())
+	siteGroup := G.Group("/site", middleware.Cors())
 	siteGroup.POST("/search", controller.SearchSiteHandler)
+	siteGroup.POST("/get_remark", controller.GetSiteRemarkHandler)
 
 	remarkGroup := G.Group("/remark", middleware.Cors(), middleware.Auth())
 	remarkGroup.POST("/add", controller.AddRemarkHandler)

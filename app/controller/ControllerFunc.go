@@ -162,8 +162,54 @@ func SearchSiteHandler(c *gin.Context) {
 	response.MyResponse(c, http.StatusOK, "Sites are: ", ss)
 }
 
-func GetSiteAverageMark(c *gin.Context) {
-
+func GetSiteRemarkHandler(c *gin.Context) {
+	sq := response.SiteQuery{}
+	err := c.BindJSON(&sq)
+	if err != nil {
+		response.MyResponse(c, http.StatusInternalServerError, "Bind input fail, "+err.Error(), nil)
+		logrus.Info("Bind input fail, " + err.Error())
+		return
+	}
+	ss := response.SSite{
+		SiteName: sq.SiteName,
+	}
+	model.DB.Table("site").Where("site_name = ?", ss.SiteName).Find(&ss)
+	if ss.Id == 0 {
+		response.MyResponse(c, http.StatusPreconditionFailed, "No such site.", nil)
+		return
+	}
+	var rmks []response.PartialRemark
+	var dbrmks []model.Remark
+	strmk := response.SiteRemark{
+		SiteName: ss.SiteName,
+		TotalCnt: 0,
+	}
+	model.DB.Table("remark").Where("site_id = ?", ss.Id).Find(&dbrmks)
+	length := len(dbrmks)
+	totalScore := 0.0
+	for i := 0; i < length; i++ {
+		totalScore += dbrmks[i].Mark
+		su := response.SUser{
+			Id: dbrmks[i].UserId,
+		}
+		mu := model.User{}
+		model.DB.Table("user").Where("id = ?", su.Id).Find(&mu)
+		rmks = append(rmks, response.PartialRemark{
+			UserName: mu.Name,
+			Content:  dbrmks[i].Content,
+			Mark:     dbrmks[i].Mark,
+		})
+	}
+	strmk.Remarks = rmks
+	strmk.SiteName = ss.SiteName
+	strmk.TotalCnt = length
+	if length != 0 {
+		strmk.Average = totalScore / float64(length)
+	} else {
+		strmk.Average = 0.0
+	}
+	response.MyResponse(c, http.StatusOK, "Remarks are: ", strmk)
+	return
 }
 
 func AddRemarkHandler(c *gin.Context) {
